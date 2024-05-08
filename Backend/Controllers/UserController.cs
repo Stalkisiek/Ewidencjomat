@@ -1,4 +1,5 @@
-﻿using Ewidencjomat.Services.Users;
+﻿using Ewidencjomat.Dtos.UserDtos;
+using Ewidencjomat.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +44,38 @@ public class UserController : Controller
     public async Task<IActionResult> DeleteUser([FromQuery] int id)
     {
         var response = await _userServices.DeleteUserById(id);
+        return StatusCode(response.StatusCode, response);
+    }
+    
+    [HttpPut]
+    [Route("Email")]
+    public async Task<IActionResult> UpdateEmail([FromBody] UpdateUserEmailDto updateUserEmailDto)
+    { 
+        var response = await _userServices.UpdateUserEmail(updateUserEmailDto);
+        return StatusCode(response.StatusCode, response);
+    }
+    
+    [HttpPut]
+    [Route("Name")]
+    public async Task<IActionResult> UpdateName([FromBody] UpdateUserNameDto updateUserNameDto)
+    {
+        var response = await _userServices.UpdateUserName(updateUserNameDto);
+        return StatusCode(response.StatusCode, response);
+    }
+    
+    [HttpPut]
+    [Route("Surname")]
+    public async Task<IActionResult> UpdateSurname([FromBody] UpdateUserSurnameDto updateUserSurnameDto)
+    {
+        var response = await _userServices.UpdateUserSurname(updateUserSurnameDto);
+        return StatusCode(response.StatusCode, response);
+    }
+    
+    [HttpPut]
+    [Route("Password")]
+    public async Task<IActionResult> UpdatePassword([FromBody] UpdateUserPasswordDto updateUserPasswordDto)
+    {
+        var response = await _userServices.UpdateUserPassword(updateUserPasswordDto);
         return StatusCode(response.StatusCode, response);
     }
 }

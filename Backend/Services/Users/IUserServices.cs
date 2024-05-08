@@ -10,8 +10,8 @@ public interface IUserServices
     Task<ServiceResponse<string>> DeleteUserById(int id);
 
     //Updates
-    Task<ServiceResponse<GetUserDto>> UpdateEmail();
-    Task<ServiceResponse<GetUserDto>> UpdateName();
-    Task<ServiceResponse<GetUserDto>> UpdateSurname();
-    Task<ServiceResponse<GetUserDto>> UpdatePassword();
+    Task<ServiceResponse<GetUserDto>> UpdateUserEmail(UpdateUserEmailDto updateUserEmailDto);
+    Task<ServiceResponse<GetUserDto>> UpdateUserName(UpdateUserNameDto updateUserNameDto);
+    Task<ServiceResponse<GetUserDto>> UpdateUserSurname(UpdateUserSurnameDto updateUserSurnameDto);
+    Task<ServiceResponse<GetUserDto>> UpdateUserPassword(UpdateUserPasswordDto updateUserPasswordDto);
 }

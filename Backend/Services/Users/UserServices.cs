@@ -160,23 +160,134 @@ public class UserServices : IUserServices
         }
     }
 
-    public async Task<ServiceResponse<GetUserDto>> UpdateEmail()
+    public async Task<ServiceResponse<GetUserDto>> UpdateUserEmail(UpdateUserEmailDto updateUserEmailDto)
     {
-        throw new NotImplementedException();
+        var response = new ServiceResponse<GetUserDto>();
+        try
+        {
+            var email = updateUserEmailDto.Email;
+            if(await _context.Users.AnyAsync(u => u.Email == email))
+            {
+                response.Success = false;
+                response.StatusCode = 400;
+                response.Message = "Email already exists";
+                return response;
+            }
+            
+            var currentUser = await _context.Users.FirstAsync(u => u.Id == _auth.GetCurrentUserId());
+            currentUser.Email = email;
+            _context.Users.Update(currentUser);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<GetUserDto>(currentUser);
+            response.Success = true;
+            response.StatusCode = 200;
+            return response;
+        }
+        catch (Exception e)
+        {
+            response.Success = false;
+            if(response.StatusCode == 200)
+                response.StatusCode = 500;
+            response.Message = e.Message;
+            return response;
+        }
+    }
+    
+    public async Task<ServiceResponse<GetUserDto>> UpdateUserName(UpdateUserNameDto updateUserNameDto)
+    {
+        var response = new ServiceResponse<GetUserDto>();
+        try
+        {
+            var name = updateUserNameDto.Name;
+            var currentUser = await _context.Users.FirstAsync(u => u.Id == _auth.GetCurrentUserId());
+            currentUser.Name = name;
+            _context.Users.Update(currentUser);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<GetUserDto>(currentUser);
+            response.Success = true;
+            response.StatusCode = 200;
+            return response;
+        }
+        catch (Exception e)
+        {
+            response.Success = false;
+            if(response.StatusCode == 200)
+                response.StatusCode = 500;
+            response.Message = e.Message;
+            return response;
+        }
     }
 
-    public async Task<ServiceResponse<GetUserDto>> UpdateName()
+    public async Task<ServiceResponse<GetUserDto>> UpdateUserSurname(UpdateUserSurnameDto updateUserSurnameDto)
     {
-        throw new NotImplementedException();
+        var response = new ServiceResponse<GetUserDto>();
+        try
+        {
+            var surname = updateUserSurnameDto.Surname;
+            var currentUser = await _context.Users.FirstAsync(u => u.Id == _auth.GetCurrentUserId());
+            currentUser.Surname = surname;
+            _context.Users.Update(currentUser);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<GetUserDto>(currentUser);
+            response.Success = true;
+            response.StatusCode = 200;
+            return response;
+        }
+        catch (Exception e)
+        {
+            response.Success = false;
+            if(response.StatusCode == 200)
+                response.StatusCode = 500;
+            response.Message = e.Message;
+            return response;
+        }
     }
 
-    public async Task<ServiceResponse<GetUserDto>> UpdateSurname()
-    {
-        throw new NotImplementedException();
-    }
 
-    public async Task<ServiceResponse<GetUserDto>> UpdatePassword()
+    public async Task<ServiceResponse<GetUserDto>> UpdateUserPassword(UpdateUserPasswordDto updateUserPasswordDto)
     {
-        throw new NotImplementedException();
+        var response = new ServiceResponse<GetUserDto>();
+        try
+        {
+            var currentPassword = updateUserPasswordDto.CurrentPassword;
+            var newPassword = updateUserPasswordDto.NewPassword;
+            var currentUser = await _context.Users.FirstAsync(u => u.Id == _auth.GetCurrentUserId());
+            
+            // check if password correct 
+            if (!_auth.VerifyPasswordHash(currentPassword, currentUser.PasswordHash, currentUser.PasswordSalt))
+            {
+                response.Success = false;
+                response.StatusCode = 400;
+                response.Message = "Current password is incorrect";
+                return response;
+            }
+            
+            // check if new password is different
+            if (currentPassword == newPassword)
+            {
+                response.Success = false;
+                response.StatusCode = 400;
+                response.Message = "New password is the same as the current password";
+                return response;
+            }
+            
+            _auth.CreatePasswordHash(newPassword, out var passwordHash, out var passwordSalt);
+            currentUser.PasswordHash = passwordHash;
+            currentUser.PasswordSalt = passwordSalt;
+            _context.Users.Update(currentUser);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<GetUserDto>(currentUser);
+            response.Success = true;
+            response.StatusCode = 200;
+            return response;
+        }
+        catch (Exception e)
+        {
+            response.Success = false;
+            if(response.StatusCode == 200)
+                response.StatusCode = 500;
+            response.Message = e.Message;
+            return response;
+        }
     }
 }
