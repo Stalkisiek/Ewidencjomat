@@ -1,6 +1,8 @@
 global using AutoMapper;
 global using Ewidencjomat.Data;
 global using Ewidencjomat.Models;
+using System.Text.Json.Serialization;
+using Ewidencjomat.Services.ContactRecords;
 using Ewidencjomat.Services.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +59,8 @@ public class Program
         //scopes
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserServices, UserServices>();
-        
+        builder.Services.AddScoped<IContactServices, ContactServices>();
+
         var app = builder.Build();
         
         // Configure the HTTP request pipeline.

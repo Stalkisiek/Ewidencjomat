@@ -57,7 +57,7 @@ public class AuthRepository : IAuthRepository
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
             
-            _context.Users.Add(user);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             // response.Data = _mapper.Map<GetUserDto>(user);
             response.Data = _mapper.Map<GetUserDto>(user);

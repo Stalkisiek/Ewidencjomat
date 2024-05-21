@@ -1,4 +1,5 @@
-﻿using Ewidencjomat.Dtos.UserDtos;
+﻿using Ewidencjomat.Dtos.ContactRecordDtos;
+using Ewidencjomat.Dtos.UserDtos;
 
 namespace Ewidencjomat;
 
@@ -13,5 +14,7 @@ public class AutoMapperProfile : Profile
         // CreateMap<{from}, {to}>()
         CreateMap<RegisterUserDto, User>();
         CreateMap<User, GetUserDto>();
+        CreateMap<ContactRecord, GetContactRecordDto>();
+        CreateMap<AddContactRecordDto, ContactRecord>();
     }
 }

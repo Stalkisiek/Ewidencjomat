@@ -11,12 +11,12 @@ namespace Ewidencjomat.Controllers;
 public class UserController : Controller
 {
     private readonly IUserServices _userServices;
-
+    
     public UserController(IUserServices userServices)
     {
         _userServices = userServices;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetUsers([FromQuery] int? id)
     {
@@ -31,7 +31,7 @@ public class UserController : Controller
             return StatusCode(response.StatusCode, response);
         }
     }
-    
+
     [HttpGet]
     [Route("Current")]
     public async Task<IActionResult> GetCurrentUser()

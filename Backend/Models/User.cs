@@ -12,4 +12,5 @@ public class User
       
       public byte[] PasswordHash {get;set;} = Array.Empty<byte>();
       public byte[] PasswordSalt {get;set;} = Array.Empty<byte>();    
+      public List<ContactRecord> ContactRecords { get; set; } = new List<ContactRecord>();
 }
