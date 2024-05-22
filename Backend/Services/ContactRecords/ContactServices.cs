@@ -70,7 +70,7 @@ public class ContactServices : IContactServices
                 return response;
             }
 
-            ContactRecord? contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c.Id == id);
+            ContactRecord? contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c!.Id == id);
             if (contact == null)
             {
                 response.StatusCode = 404;
@@ -100,7 +100,7 @@ public class ContactServices : IContactServices
         var response = new ServiceResponse<GetContactRecordDto>();
         try
         {
-            ContactRecord? contact = new ContactRecord
+            ContactRecord contact = new ContactRecord
             {
                 Name = newContact.Name,
                 Surname = newContact.Surname,
@@ -140,8 +140,10 @@ public class ContactServices : IContactServices
         var response = new ServiceResponse<int>();
         try
         {
-            ContactRecord? contact = await _context.ContactRecords.Include(contactRecord => contactRecord.User!)
-                .FirstOrDefaultAsync(c => c.Id == id);
+#pragma warning disable CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
+            ContactRecord? contact = await _context.ContactRecords.Include(contactRecord => contactRecord!.User!)
+#pragma warning restore CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
+                .FirstOrDefaultAsync(c => c!.Id == id);
             //only admin can delete contact
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _authRepository.GetCurrentUserId());
             if (user!.Role != UserTypes.Admin && user.Role != UserTypes.Server)
@@ -193,7 +195,7 @@ public class ContactServices : IContactServices
                 return response;
             }
 
-            var contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c.Id == updatedContact.Id);
+            var contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c!.Id == updatedContact.Id);
             if (contact == null)
             {
                 response.StatusCode = 404;
@@ -252,7 +254,9 @@ public class ContactServices : IContactServices
         try
         {
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == _authRepository.GetCurrentUserId());
-            var contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c.Id == changeOwnershipContactDto.ContactId);
+#pragma warning disable CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
+            var contact = await _context.ContactRecords.Include(contactRecord => contactRecord!.User).FirstOrDefaultAsync(c => c!.Id == changeOwnershipContactDto.ContactId);
+#pragma warning restore CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
             
             if(contact == null)
             {
@@ -262,7 +266,7 @@ public class ContactServices : IContactServices
                 return response;
             }
             
-            if(currentUser.Role != UserTypes.Admin && currentUser.Role != UserTypes.Server && currentUser != contact.User)
+            if(currentUser!.Role != UserTypes.Admin && currentUser.Role != UserTypes.Server && currentUser != contact.User)
             {
                 response.StatusCode = 403;
                 response.Success = false;
