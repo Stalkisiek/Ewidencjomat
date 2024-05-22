@@ -18,10 +18,18 @@ public class ContactRecordController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllContactRecords()
+    public async Task<IActionResult> GetContactRecords(int? Id)
     {
-        var response = await _contactServices.GetAllContactsAsync();
-        return StatusCode(response.StatusCode, response);
+        if(Id.HasValue)
+        {
+            var response = await _contactServices.GetContactByIdAsync(Id.Value);
+            return StatusCode(response.StatusCode, response);
+        }
+        else
+        {
+            var response = await _contactServices.GetAllContactsAsync();
+            return StatusCode(response.StatusCode, response);
+        }
     }
     
     [HttpPost]
@@ -30,4 +38,12 @@ public class ContactRecordController : Controller
         var response = await _contactServices.AddContactAsync(newContact);
         return StatusCode(response.StatusCode, response);
     }
+    
+    [HttpDelete]
+    public async Task<IActionResult> DeleteContactRecord([FromQuery]int id)
+    {
+        var response = await _contactServices.DeleteContactAsync(id);
+        return StatusCode(response.StatusCode, response);
+    }
+    
 }

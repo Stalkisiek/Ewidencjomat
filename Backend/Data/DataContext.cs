@@ -11,5 +11,5 @@ public class DataContext : DbContext
     // public DbSet<{Entity}> {Entities} { get; set; }
     
     public DbSet<User> Users { get; set; }
-    public DbSet<ContactRecord> ContactRecords { get; set; }
+    public DbSet<ContactRecord?> ContactRecords { get; set; }
 }
