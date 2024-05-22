@@ -46,4 +46,17 @@ public class ContactRecordController : Controller
         return StatusCode(response.StatusCode, response);
     }
     
+    [HttpPut]
+    public async Task<IActionResult> UpdateContactRecord(UpdateContactRecordDto updatedContact)
+    {
+        var response = await _contactServices.UpdateContactAsync(updatedContact);
+        return StatusCode(response.StatusCode, response);
+    }
+    
+    [HttpPut("ownership")]
+    public async Task<IActionResult> UpdateContactOwnership(ChangeOwnershipContactDto changeOwnershipContactDto)
+    {
+        var response = await _contactServices.UpdateContactOwnershipAsync(changeOwnershipContactDto);
+        return StatusCode(response.StatusCode, response);
+    }
 }

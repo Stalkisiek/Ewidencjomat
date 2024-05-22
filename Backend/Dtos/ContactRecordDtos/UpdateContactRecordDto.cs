@@ -2,16 +2,17 @@
 
 public class UpdateContactRecordDto
 {
-    public string? Name { get; set; } = string.Empty;
-    public string? Surname { get; set; } = string.Empty;
-    public string? Gender { get; set; } = string.Empty;
-    public string? City { get; set; } = string.Empty;
-    public string? ReadyToMove { get; set; } = string.Empty;
-    public string? FirstContactDate { get; set; } = string.Empty;
-    public string? LastContactDate { get; set; } = string.Empty;
-    public string? PhoneNumber { get; set; } = string.Empty;
-    public string? Source { get; set; } = string.Empty;
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Surname { get; set; }
+    public string? Gender { get; set; }
+    public string? City { get; set; }
+    public string? ReadyToMove { get; set; }
+    public string? FirstContactDate { get; set; }
+    public string? LastContactDate { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? Source { get; set; }
     public int? Age { get; set; }
-    public string? Occupation { get; set; } = string.Empty;
-    public string? AdditionalInformation { get; set; } = string.Empty;
+    public string? Occupation { get; set; }
+    public string? AdditionalInformation { get; set; }
 }

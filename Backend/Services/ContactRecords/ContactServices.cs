@@ -15,6 +15,7 @@ public class ContactServices : IContactServices
         _authRepository = authRepository;
         _mapper = mapper;
     }
+
     public async Task<ServiceResponse<List<GetContactRecordDto>>> GetAllContactsAsync()
     {
         var response = new ServiceResponse<List<GetContactRecordDto>>();
@@ -29,8 +30,8 @@ public class ContactServices : IContactServices
                 response.Message = "User not found.";
                 return response;
             }
-            
-            if(user.Role != UserTypes.Admin && user.Role != UserTypes.Server)
+
+            if (user.Role != UserTypes.Admin && user.Role != UserTypes.Server)
             {
                 response.StatusCode = 403;
                 response.Success = false;
@@ -38,14 +39,15 @@ public class ContactServices : IContactServices
                 return response;
             }
 
-            response.Data = await _context.ContactRecords.Select(c => _mapper.Map<GetContactRecordDto>(c)).ToListAsync();
+            response.Data = await _context.ContactRecords.Select(c => _mapper.Map<GetContactRecordDto>(c))
+                .ToListAsync();
             response.StatusCode = 200;
             response.Success = true;
             return response;
         }
         catch (Exception e)
         {
-            if(response.StatusCode == 200)
+            if (response.StatusCode == 200)
                 response.StatusCode = 500;
             response.Success = false;
             response.Message = e.Message;
@@ -59,8 +61,8 @@ public class ContactServices : IContactServices
         try
         {
             User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _authRepository.GetCurrentUserId());
-            
-            if(user != null && user.Role != UserTypes.Admin && user.Role != UserTypes.Server)
+
+            if (user != null && user.Role != UserTypes.Admin && user.Role != UserTypes.Server)
             {
                 response.StatusCode = 403;
                 response.Success = false;
@@ -69,13 +71,14 @@ public class ContactServices : IContactServices
             }
 
             ContactRecord? contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c.Id == id);
-            if(contact == null)
+            if (contact == null)
             {
                 response.StatusCode = 404;
                 response.Success = false;
                 response.Message = "Contact not found.";
                 return response;
             }
+
             response.Data = _mapper.Map<GetContactRecordDto>(contact);
             response.StatusCode = 200;
             response.Success = true;
@@ -83,10 +86,10 @@ public class ContactServices : IContactServices
         }
         catch (Exception e)
         {
-            if(response.StatusCode == 200)
+            if (response.StatusCode == 200)
                 response.StatusCode = 500;
             response.Success = false;
-            if(response.Message == String.Empty)
+            if (response.Message == String.Empty)
                 response.Message = e.Message;
             return response;
         }
@@ -113,7 +116,7 @@ public class ContactServices : IContactServices
                 AdditionalInformation = newContact.AdditionalInformation
             };
             var userId = _authRepository.GetCurrentUserId();
-            contact.User = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId); 
+            contact.User = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             await _context.ContactRecords.AddAsync(contact);
             await _context.SaveChangesAsync();
             response.Data = _mapper.Map<GetContactRecordDto>(contact);
@@ -123,13 +126,13 @@ public class ContactServices : IContactServices
         }
         catch (Exception e)
         {
-            if(response.StatusCode == 200)
+            if (response.StatusCode == 200)
                 response.StatusCode = 500;
             response.Success = false;
             response.Message = e.Message;
             return response;
         }
-        
+
     }
 
     public async Task<ServiceResponse<int>> DeleteContactAsync(int id)
@@ -137,51 +140,11 @@ public class ContactServices : IContactServices
         var response = new ServiceResponse<int>();
         try
         {
-            ContactRecord? contact = await _context.ContactRecords.Include(contactRecord => contactRecord.User!).FirstOrDefaultAsync(c => c.Id == id);
+            ContactRecord? contact = await _context.ContactRecords.Include(contactRecord => contactRecord.User!)
+                .FirstOrDefaultAsync(c => c.Id == id);
             //only admin can delete contact
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _authRepository.GetCurrentUserId());
-            if(user.Role != UserTypes.Admin && user.Role != UserTypes.Server)
-            {
-                response.StatusCode = 403;
-                response.Success = false;
-                response.Message = "You are not authorized to delete this contact.";
-                return response;
-            }
-            
-            if(contact == null)
-            {
-                response.StatusCode = 404;
-                response.Success = false;
-                response.Message = "Contact not found.";
-                return response;
-            }
-           
-            _context.ContactRecords.Remove(contact);
-            await _context.SaveChangesAsync();
-            response.Data = id;
-            response.StatusCode = 200;
-            response.Success = true;
-            return response;
-        }
-        catch (Exception e)
-        {
-            if(response.StatusCode == 200)
-                response.StatusCode = 500;
-            response.Success = false;
-            if(response.Message == String.Empty)
-                response.Message = e.Message;
-            return response;
-        }
-    }
-
-    public async Task<ServiceResponse<GetContactRecordDto>> UpdateContactAsync(UpdateContactRecordDto updatedContact)
-    {
-        var response = new ServiceResponse<GetContactRecordDto>();
-        try
-        {
-            //only admin or owner can update contact
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _authRepository.GetCurrentUserId());
-            if (user.Role != UserTypes.Admin && user.Role != UserTypes.Server)
+            if (user!.Role != UserTypes.Admin && user.Role != UserTypes.Server)
             {
                 response.StatusCode = 403;
                 response.Success = false;
@@ -196,14 +159,150 @@ public class ContactServices : IContactServices
                 response.Message = "Contact not found.";
                 return response;
             }
+
+            _context.ContactRecords.Remove(contact);
+            await _context.SaveChangesAsync();
+            response.Data = id;
+            response.StatusCode = 200;
+            response.Success = true;
+            return response;
         }
         catch (Exception e)
         {
-            if(response.StatusCode == 200)
+            if (response.StatusCode == 200)
                 response.StatusCode = 500;
             response.Success = false;
-            if(response.Message == String.Empty)
+            if (response.Message == String.Empty)
                 response.Message = e.Message;
             return response;
         }
     }
+
+    public async Task<ServiceResponse<GetContactRecordDto>> UpdateContactAsync(UpdateContactRecordDto updatedContact)
+    {
+        var response = new ServiceResponse<GetContactRecordDto>();
+        try
+        {
+            //only admin or owner can update contact
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == _authRepository.GetCurrentUserId());
+            if (user!.Role != UserTypes.Admin && user.Role != UserTypes.Server && user.Id != updatedContact.Id)
+            {
+                response.StatusCode = 403;
+                response.Success = false;
+                response.Message = "You are not authorized to update this contact.";
+                return response;
+            }
+
+            var contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c.Id == updatedContact.Id);
+            if (contact == null)
+            {
+                response.StatusCode = 404;
+                response.Success = false;
+                response.Message = "Contact not found.";
+                return response;
+            }
+
+            if (updatedContact.Name != null)
+                contact.Name = updatedContact.Name;
+            if (updatedContact.Surname != null)
+                contact.Surname = updatedContact.Surname;
+            if (updatedContact.FirstContactDate != null)
+                contact.FirstContactDate = updatedContact.FirstContactDate;
+            if (updatedContact.LastContactDate != null)
+                contact.LastContactDate = updatedContact.LastContactDate;
+            if (updatedContact.Gender != null)
+                contact.Gender = updatedContact.Gender;
+            if (updatedContact.City != null)
+                contact.City = updatedContact.City;
+            if (updatedContact.ReadyToMove != null)
+                contact.ReadyToMove = updatedContact.ReadyToMove;
+            if (updatedContact.PhoneNumber != null)
+                contact.PhoneNumber = updatedContact.PhoneNumber;
+            if (updatedContact.Source != null)
+                contact.Source = updatedContact.Source;
+            if (updatedContact.Age.HasValue)
+                contact.Age = updatedContact.Age.Value;
+            if (updatedContact.Occupation != null)
+                contact.Occupation = updatedContact.Occupation;
+            if (updatedContact.AdditionalInformation != null)
+                contact.AdditionalInformation = updatedContact.AdditionalInformation;
+
+            _context.ContactRecords.Update(contact);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<GetContactRecordDto>(contact);
+            response.StatusCode = 200;
+            response.Success = true;
+            return response;
+
+        }
+        catch (Exception e)
+        {
+            if (response.StatusCode == 200)
+                response.StatusCode = 500;
+            response.Success = false;
+            if (response.Message == String.Empty)
+                response.Message = e.Message;
+            return response;
+        }
+    }
+
+    public async Task<ServiceResponse<GetContactRecordDto>> UpdateContactOwnershipAsync(ChangeOwnershipContactDto changeOwnershipContactDto)
+    {
+        var response = new ServiceResponse<GetContactRecordDto>();
+        try
+        {
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == _authRepository.GetCurrentUserId());
+            var contact = await _context.ContactRecords.FirstOrDefaultAsync(c => c.Id == changeOwnershipContactDto.ContactId);
+            
+            if(contact == null)
+            {
+                response.StatusCode = 404;
+                response.Success = false;
+                response.Message = "Contact not found.";
+                return response;
+            }
+            
+            if(currentUser.Role != UserTypes.Admin && currentUser.Role != UserTypes.Server && currentUser != contact.User)
+            {
+                response.StatusCode = 403;
+                response.Success = false;
+                response.Message = "You are not authorized to change ownership of this contact.";
+                return response;
+            }
+            
+            var newOwner = await _context.Users.FirstOrDefaultAsync(u => u.Id == changeOwnershipContactDto.NewOwnerId);
+            if (newOwner == null)
+            {
+                response.StatusCode = 404;
+                response.Success = false;
+                response.Message = "New owner not found.";
+                return response;
+            }
+            
+            if(newOwner == contact.User)
+            {
+                response.StatusCode = 400;
+                response.Success = false;
+                response.Message = "New owner is the same as the current owner.";
+                return response;
+            }
+            
+            contact.User = newOwner;
+            _context.ContactRecords.Update(contact);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<GetContactRecordDto>(contact);
+            response.StatusCode = 200;
+            response.Success = true;
+            return response;
+        }
+        catch (Exception e)
+        {
+            if (response.StatusCode == 200)
+                response.StatusCode = 500;
+            response.Success = false;
+            if (response.Message == String.Empty)
+                response.Message = e.Message;
+            return response;
+        }
+    }
+}
